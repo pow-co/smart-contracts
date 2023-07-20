@@ -1,9 +1,13 @@
 {
   "name": "@powco/smart-contracts",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Collection of Smart Contracts for Sharing Among Front And Back End Developers",
   "author": "The Proof of Work Company",
   "main": "dist/src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pow-co/smart-contracts"
+  },
   "scripts": {
     "prebuild": "npm run clean",
     "build": "tsc && npx scrypt-cli compile",

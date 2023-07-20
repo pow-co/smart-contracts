@@ -2,6 +2,8 @@
 
 Quick access to all known smart contracts on powco at your fingertips
 
+[![npm version](https://badge.fury.io/js/@powco%2Fsmart-contracts.svg)](https://badge.fury.io/js/@powco%2Fsmart-contracts)
+
 ```
 npm install --save @powco/smart-contracts
 ```
@@ -27,7 +29,7 @@ blockchain.
 ## Adding Your Contracts
 
 Simply write your contract in the same format as the others in src/contracts, which
-conform to the convention laid out by the scrypt-cli project generator. 
+conform to the convention laid out by the scrypt-cli project generator.
 
 ## Usage in Development
 
