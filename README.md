@@ -1,4 +1,4 @@
-# Powco Smart Contracts
+# Scrypt Smart Contracts
 
 Quick access to all known smart contracts on powco at your fingertips
 
