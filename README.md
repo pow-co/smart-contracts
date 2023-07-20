@@ -4,6 +4,10 @@ Quick access to all known smart contracts on powco at your fingertips
 
 [![npm version](https://badge.fury.io/js/@powco%2Fsmart-contracts.svg)](https://badge.fury.io/js/@powco%2Fsmart-contracts)
 [![CircleCI](https://circleci.com/gh/pow-co/smart-contracts.svg?style=svg)](https://circleci.com/gh/pow-co/smart-contracts)
+![Bitcoin SV](https://img.shields.io/badge/Bitcoin%20SV-EAB300?style=for-the-badge&logo=Bitcoin%20SV&logoColor=white)
+![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![Mocha](https://img.shields.io/badge/-mocha-%238D6748?style=for-the-badge&logo=mocha&logoColor=white)
 
 ```
 npm install --save @powco/smart-contracts
