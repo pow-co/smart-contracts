@@ -3,6 +3,7 @@
 Quick access to all known smart contracts on powco at your fingertips
 
 [![npm version](https://badge.fury.io/js/@powco%2Fsmart-contracts.svg)](https://badge.fury.io/js/@powco%2Fsmart-contracts)
+[![CircleCI](https://circleci.com/gh/pow-co/smart-contracts.svg?style=svg)](https://circleci.com/gh/pow-co/smart-contracts)
 
 ```
 npm install --save @powco/smart-contracts
