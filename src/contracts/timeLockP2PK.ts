@@ -1,14 +1,4 @@
-import {
-    method,
-    prop,
-    SmartContract,
-    hash256,
-    assert,
-    ByteString,
-    SigHash,
-    PubKey,
-    Sig
-} from 'scrypt-ts'
+import { method, prop, SmartContract, assert, PubKey, Sig } from 'scrypt-ts'
 
 export class TimeLockP2PK extends SmartContract {
     @prop()
@@ -25,9 +15,10 @@ export class TimeLockP2PK extends SmartContract {
 
     @method()
     public unlock(signature: Sig) {
-      assert(this.checkSig(signature, this.owner), `checkSig failed, pubkey: ${this.owner}`)
-      assert(this.ctx.locktime >= this.matureTime, "locktime too low")
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
+        assert(this.ctx.locktime >= this.matureTime, 'locktime too low')
     }
-
 }
-

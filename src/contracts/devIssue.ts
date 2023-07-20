@@ -6,43 +6,41 @@ import {
     assert,
     ByteString,
     SigHash,
-    PubKey
 } from 'scrypt-ts'
 
 export class DevIssue extends SmartContract {
-
     @prop(true)
-    closed: boolean;
+    closed: boolean
 
     @prop()
-    version: ByteString;
+    version: ByteString
 
     @prop()
-    platform: ByteString;
- 
-    @prop()
-    org: ByteString;
+    platform: ByteString
 
     @prop()
-    repo: ByteString;
+    org: ByteString
 
     @prop()
-    issue_number: ByteString;
+    repo: ByteString
 
     @prop()
-    title: ByteString;
+    issue_number: ByteString
 
     @prop()
-    description: ByteString;
+    title: ByteString
+
+    @prop()
+    description: ByteString
 
     constructor(
-      version: ByteString,
-      platform: ByteString,
-      org: ByteString,
-      repo: ByteString,
-      issue_number: ByteString,
-      title: ByteString,
-      description: ByteString,
+        version: ByteString,
+        platform: ByteString,
+        org: ByteString,
+        repo: ByteString,
+        issue_number: ByteString,
+        title: ByteString,
+        description: ByteString
     ) {
         super(version, platform, org, repo, issue_number, title, description)
         this.version = version
@@ -77,4 +75,3 @@ export class DevIssue extends SmartContract {
         assert(this.ctx.hashOutputs === hash256(output), 'hashOutputs mismatch')
     }
 }
-

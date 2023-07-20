@@ -2,14 +2,11 @@ import {
     method,
     prop,
     SmartContract,
-    hash256,
     hash160,
     assert,
-    ByteString,
-    SigHash,
     PubKey,
     PubKeyHash,
-    Sig
+    Sig,
 } from 'scrypt-ts'
 
 export class TimeLockP2PKH extends SmartContract {
@@ -27,12 +24,13 @@ export class TimeLockP2PKH extends SmartContract {
 
     @method()
     public unlock(signature: Sig, pubkey: PubKey) {
-      assert(hash160(pubkey) === this.pubKeyHash)
-      assert(this.checkSig(signature, pubkey), `checkSig failed, pubKeyHash: ${this.pubKeyHash}`)
-      assert(this.ctx.locktime >= this.matureTime, "locktime too low")
+        assert(hash160(pubkey) === this.pubKeyHash)
+        assert(
+            this.checkSig(signature, pubkey),
+            `checkSig failed, pubKeyHash: ${this.pubKeyHash}`
+        )
+        assert(this.ctx.locktime >= this.matureTime, 'locktime too low')
     }
-
 }
 
 export default TimeLockP2PKH
-
