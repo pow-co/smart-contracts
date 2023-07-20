@@ -1,0 +1,36 @@
+{
+    "version": 9,
+    "compilerVersion": "1.19.0+commit.72eaeba",
+    "contract": "MessageHash256",
+    "md5": "9385c4a752493cde2c1333a577d94151",
+    "structs": [],
+    "library": [],
+    "alias": [],
+    "abi": [
+        {
+            "type": "function",
+            "name": "unlock",
+            "index": 0,
+            "params": [
+                {
+                    "name": "message",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "type": "constructor",
+            "params": [
+                {
+                    "name": "hash",
+                    "type": "Sha256"
+                }
+            ]
+        }
+    ],
+    "stateProps": [],
+    "buildType": "debug",
+    "file": "file:///@powco/smart-contracts/artifacts/messageHash256.scrypt",
+    "hex": "<hash>5179a85179877777",
+    "sourceMapFile": ""
+}

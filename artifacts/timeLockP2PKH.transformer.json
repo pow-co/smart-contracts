@@ -1,0 +1,9 @@
+{
+  "success": true,
+  "errors": [],
+  "scryptfile": "timeLockP2PKH.scrypt",
+  "sourceMapFile": "timeLockP2PKH.scrypt.map",
+  "ctxMethods": [
+    "unlock"
+  ]
+}

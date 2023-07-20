@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "errors": [],
+  "scryptfile": "devIssue.scrypt",
+  "sourceMapFile": "devIssue.scrypt.map",
+  "ctxMethods": [
+    "closeIssue",
+    "reopenIssue"
+  ]
+}

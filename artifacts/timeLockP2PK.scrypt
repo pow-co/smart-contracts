@@ -1,0 +1,14 @@
+
+contract TimeLockP2PK {
+  int matureTime;
+  PubKey owner;
+  constructor(PubKey owner, int matureTime) {
+    this.owner = owner;
+    this.matureTime = matureTime;
+  }
+  public function unlock(Sig signature, SigHashPreimage __scrypt_ts_txPreimage) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    require(checkSig(signature, this.owner));
+    require(SigHash.nLocktime(__scrypt_ts_txPreimage) >= this.matureTime);
+  }
+}

@@ -1,0 +1,39 @@
+
+contract DevIssue {
+  @state bool closed;
+  bytes version;
+  bytes platform;
+  bytes org;
+  bytes repo;
+  bytes issue_number;
+  bytes title;
+  bytes description;
+  constructor(bytes version, bytes platform, bytes org, bytes repo, bytes issue_number, bytes title, bytes description) {
+    this.version = version;
+    this.platform = platform;
+    this.org = org;
+    this.repo = repo;
+    this.issue_number = issue_number;
+    this.title = title;
+    this.description = description;
+    this.closed = false;
+  }
+  public function closeIssue(SigHashPreimage __scrypt_ts_txPreimage) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'c3')));
+    this.closed = true;
+    int amount = SigHash.value(__scrypt_ts_txPreimage);
+    bytes output = this.buildStateOutput(amount);
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(output));
+  }
+  public function reopenIssue(SigHashPreimage __scrypt_ts_txPreimage) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'c3')));
+    this.closed = false;
+    int amount = SigHash.value(__scrypt_ts_txPreimage);
+    bytes output = this.buildStateOutput(amount);
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(output));
+  }
+    function buildStateOutput(int amount): bytes {
+      bytes script = this.getStateScript();
+      return Utils.buildOutput(script, amount);
+    }
+}

@@ -1,0 +1,15 @@
+
+contract TimeLockP2PKH {
+  int matureTime;
+  Ripemd160 pubKeyHash;
+  constructor(Ripemd160 pubKeyHash, int matureTime) {
+    this.pubKeyHash = pubKeyHash;
+    this.matureTime = matureTime;
+  }
+  public function unlock(Sig signature, PubKey pubkey, SigHashPreimage __scrypt_ts_txPreimage) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    require(hash160(pubkey) == this.pubKeyHash);
+    require(checkSig(signature, pubkey));
+    require(SigHash.nLocktime(__scrypt_ts_txPreimage) >= this.matureTime);
+  }
+}
