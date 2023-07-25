@@ -1,7 +1,5 @@
 import { join } from 'path'
 
-import { readFileSync } from 'fs'
-
 import { SmartContract } from 'scrypt-ts'
 
 interface Contracts {
@@ -31,7 +29,7 @@ for (const className in contracts) {
         artifactFileName
     )
 
-    const artifact = JSON.parse(readFileSync(artifactPath).toString())
+    const artifact = require(artifactPath)
 
     const Contract = contracts[className]
 

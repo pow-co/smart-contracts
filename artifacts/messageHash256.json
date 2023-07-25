@@ -30,7 +30,7 @@
     ],
     "stateProps": [],
     "buildType": "debug",
-    "file": "file:///@powco/smart-contracts/artifacts/messageHash256.scrypt",
+    "file": "file:///Users/zyler/Desktop/smart-contracts/artifacts/messageHash256.scrypt",
     "hex": "<hash>5179a85179877777",
     "sourceMapFile": ""
 }

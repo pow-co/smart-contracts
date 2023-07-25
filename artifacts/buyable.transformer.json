@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "errors": [],
+  "scryptfile": "buyable.scrypt",
+  "sourceMapFile": "buyable.scrypt.map",
+  "ctxMethods": [
+    "buy",
+    "unlock"
+  ]
+}
