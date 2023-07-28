@@ -4,6 +4,7 @@
   "scryptfile": "url.scrypt",
   "sourceMapFile": "url.scrypt.map",
   "ctxMethods": [
-    "unlock"
+    "unlock",
+    "transfer"
   ]
 }
