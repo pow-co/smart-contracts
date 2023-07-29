@@ -1,0 +1,43 @@
+
+contract Sellable {
+  PubKey owner;
+  bytes topic;
+  @state int price;
+  constructor(bytes topic, PubKey owner, int price) {
+    this.topic = topic;
+    this.owner = owner;
+    this.price = price;
+  }
+  public function setPrice(int price, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    require(checkSig(signature, this.owner));
+    this.price = price;
+    int amount = SigHash.value(__scrypt_ts_txPreimage);
+    bytes outputs = this.buildStateOutput(amount);
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+  }
+  public function remove(Sig signature) {
+    require(checkSig(signature, this.owner));
+  }
+  public function buy(PubKey pubKey, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    require(this.price > 0);
+    PubKey seller = this.owner;
+    bytes purchase = Utils.buildOutput(Utils.buildPublicKeyHashScript(hash160(seller)), this.price);
+    this.owner = pubKey;
+    this.price = 0;
+    bytes stateOutput = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    bytes outputs = stateOutput + purchase;
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+  }
+    function buildStateOutput(int amount): bytes {
+      bytes script = this.getStateScript();
+      return Utils.buildOutput(script, amount);
+    }
+}

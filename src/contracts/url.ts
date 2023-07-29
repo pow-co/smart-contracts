@@ -11,7 +11,7 @@ import {
     PubKeyHash,
 } from 'scrypt-ts'
 
-export class Buyable extends SmartContract {
+export class Url extends SmartContract {
 
     @prop()
     url: ByteString

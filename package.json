@@ -18,6 +18,7 @@
     "prebuild": "npm run clean",
     "build": "tsc && npx scrypt-cli compile",
     "deploy": "npx ts-node ./deploy.ts",
+    "compile": "npx scrypt-cli compile",
     "clean": "rimraf scrypt.index.json && rimraf dist && rimraf artifacts",
     "pretest": "npm run build",
     "test": "mocha 'dist/tests/**/*.test.js' --timeout 1200000",
@@ -36,6 +37,7 @@
     ]
   },
   "dependencies": {
+    "axios": "^1.4.0",
     "dotenv": "^16.0.3",
     "require-all": "^3.0.0",
     "scrypt-ts": "latest"
