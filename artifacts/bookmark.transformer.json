@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "errors": [],
+  "scryptfile": "bookmark.scrypt",
+  "sourceMapFile": "bookmark.scrypt.map",
+  "ctxMethods": [
+    "setTags",
+    "setDirectory"
+  ]
+}
