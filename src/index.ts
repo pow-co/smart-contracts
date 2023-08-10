@@ -5,22 +5,17 @@ import { readFileSync } from 'fs'
 import { SmartContract } from 'scrypt-ts'
 
 interface Contracts {
-    [key: string]: SmartContract
+    [key: string]: typeof SmartContract
 }
 
-const contracts: Contracts = require('require-all')({
-    dirname: join(__dirname, 'contracts'),
+import Video from './contracts/video'
 
-    map: (name) => capitalizeFirstLetter(name),
+const contracts: Contracts = {
+  'Video': Video
+}
 
-    resolve: (_module) => {
-        if (_module.default) return _module.default
+function loadArtifact(className: string) {
 
-        return _module[Object.keys(_module)[0]]
-    },
-})
-
-for (const className in contracts) {
     const artifactFileName = `${lowercaseFirstLetter(className)}.json`
 
     const artifactPath = join(
@@ -38,8 +33,19 @@ for (const className in contracts) {
     //@ts-ignore
     Contract.loadArtifact(artifact)
 
-    module.exports[className] = Contract
 }
+
+for (const contract in contracts) {
+
+    console.log(contract)
+
+    loadArtifact(contract)
+
+    module.exports[contract] = contracts[contract]
+
+}
+
+export { Video }
 
 export { contracts }
 

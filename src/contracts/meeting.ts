@@ -2,6 +2,7 @@ import {
     assert,
     ByteString,
     method,
+    toByteString,
     prop,
     sha256,
     hash256,
@@ -14,15 +15,17 @@ import {
 } from 'scrypt-ts'
 
 export class Meeting extends SmartContract {
+    @prop(true)
+    title: ByteString;
 
     @prop(true)
     admins: HashedSet<PubKey>
 
     @prop(true)
-    invitees: HashedSet<PubKey>
+    attendees: HashedSet<PubKey>
 
     @prop(true)
-    attendees: HashedSet<PubKey>
+    invitees: HashedSet<PubKey>
 
     @prop(true)
     cancelled: boolean
@@ -31,16 +34,18 @@ export class Meeting extends SmartContract {
     inviteRequired: boolean
 
     constructor(
+      title: ByteString,
       admins: HashedSet<PubKey>,
       invitees: HashedSet<PubKey>,
       attendees: HashedSet<PubKey>,
       inviteRequired: boolean
     ) {
         super(...arguments)
+        this.title = title
         this.admins = admins
         this.invitees = invitees
-        this.attendees = attendees
         this.inviteRequired = inviteRequired
+        this.attendees = attendees
         this.cancelled = false
     }
 
