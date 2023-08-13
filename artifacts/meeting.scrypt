@@ -1,0 +1,97 @@
+
+contract Meeting {
+  @state bytes title;
+  @state HashedSet<PubKey> admins;
+  VarIntReader __scrypt_ts_accessPathReaderForProp__admins;
+  @state HashedSet<PubKey> attendees;
+  VarIntReader __scrypt_ts_accessPathReaderForProp__attendees;
+  @state HashedSet<PubKey> invitees;
+  VarIntReader __scrypt_ts_accessPathReaderForProp__invitees;
+  @state bool cancelled;
+  @state bool inviteRequired;
+  constructor(bytes title, HashedSet<PubKey> admins, HashedSet<PubKey> invitees, HashedSet<PubKey> attendees, bool inviteRequired) {
+    this.title = title;
+    this.admins = admins;
+    this.invitees = invitees;
+    this.inviteRequired = inviteRequired;
+    this.attendees = attendees;
+    this.cancelled = false;
+  }
+  public function uncancel(PubKey pubkey, Sig sig, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress, bytes __scrypt_ts_accessPathForProp__admins) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_accessPathReaderForProp__admins = new VarIntReader(__scrypt_ts_accessPathForProp__admins);
+    require(checkSig(sig, pubkey));
+    require(this.admins.has({pubkey, this.__scrypt_ts_accessPathReaderForProp__admins.readInt()}));
+    this.cancelled = false;
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+  }
+  public function invite(PubKey invitee, PubKey pubkey, Sig sig, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress, bytes __scrypt_ts_accessPathForProp__admins, bytes __scrypt_ts_accessPathForProp__attendees, bytes __scrypt_ts_accessPathForProp__invitees) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_accessPathReaderForProp__admins = new VarIntReader(__scrypt_ts_accessPathForProp__admins);
+    this.__scrypt_ts_accessPathReaderForProp__attendees = new VarIntReader(__scrypt_ts_accessPathForProp__attendees);
+    this.__scrypt_ts_accessPathReaderForProp__invitees = new VarIntReader(__scrypt_ts_accessPathForProp__invitees);
+    require(checkSig(sig, pubkey));
+    require(this.admins.has({pubkey, this.__scrypt_ts_accessPathReaderForProp__admins.readInt()}));
+    if(!this.invitees.has({invitee, this.__scrypt_ts_accessPathReaderForProp__invitees.readInt()}) && !this.attendees.has({invitee, this.__scrypt_ts_accessPathReaderForProp__attendees.readInt()})) {
+        require(this.invitees.add({invitee, this.__scrypt_ts_accessPathReaderForProp__invitees.readInt()}));
+      }
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+  }
+  public function decline(PubKey pubkey, Sig sig, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress, bytes __scrypt_ts_accessPathForProp__attendees, bytes __scrypt_ts_accessPathForProp__invitees) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_accessPathReaderForProp__attendees = new VarIntReader(__scrypt_ts_accessPathForProp__attendees);
+    this.__scrypt_ts_accessPathReaderForProp__invitees = new VarIntReader(__scrypt_ts_accessPathForProp__invitees);
+    require(checkSig(sig, pubkey));
+    if(this.invitees.has({pubkey, this.__scrypt_ts_accessPathReaderForProp__invitees.readInt()})) {
+        this.invitees.delete({pubkey, this.__scrypt_ts_accessPathReaderForProp__invitees.readInt()});
+      }
+    if(this.attendees.has({pubkey, this.__scrypt_ts_accessPathReaderForProp__attendees.readInt()})) {
+        this.attendees.delete({pubkey, this.__scrypt_ts_accessPathReaderForProp__attendees.readInt()});
+      }
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+  }
+  public function attend(PubKey pubkey, Sig sig, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress, bytes __scrypt_ts_accessPathForProp__admins, bytes __scrypt_ts_accessPathForProp__attendees, bytes __scrypt_ts_accessPathForProp__invitees) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_accessPathReaderForProp__admins = new VarIntReader(__scrypt_ts_accessPathForProp__admins);
+    this.__scrypt_ts_accessPathReaderForProp__attendees = new VarIntReader(__scrypt_ts_accessPathForProp__attendees);
+    this.__scrypt_ts_accessPathReaderForProp__invitees = new VarIntReader(__scrypt_ts_accessPathForProp__invitees);
+    require(checkSig(sig, pubkey));
+    if(this.inviteRequired) {
+        require(this.invitees.has({pubkey, this.__scrypt_ts_accessPathReaderForProp__invitees.readInt()}) || this.admins.has({pubkey, this.__scrypt_ts_accessPathReaderForProp__admins.readInt()}));
+      }
+    require(this.attendees.add({pubkey, this.__scrypt_ts_accessPathReaderForProp__attendees.readInt()}));
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+  }
+  public function cancel(PubKey pubkey, Sig sig, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress, bytes __scrypt_ts_accessPathForProp__admins) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_accessPathReaderForProp__admins = new VarIntReader(__scrypt_ts_accessPathForProp__admins);
+    require(checkSig(sig, pubkey));
+    require(this.admins.has({pubkey, this.__scrypt_ts_accessPathReaderForProp__admins.readInt()}));
+    this.cancelled = true;
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+  }
+    function buildStateOutput(int amount): bytes {
+      bytes script = this.getStateScript();
+      return Utils.buildOutput(script, amount);
+    }
+}

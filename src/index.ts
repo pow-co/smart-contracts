@@ -2,7 +2,14 @@ import { join } from 'path'
 
 import { readFileSync } from 'fs'
 
-import { SmartContract } from 'scrypt-ts'
+import { SmartContract, ByteString } from 'scrypt-ts'
+
+export {
+    HashedMap,
+    bsv
+} from 'scrypt-ts'
+
+export { ByteString }
 
 interface Contracts {
     [key: string]: typeof SmartContract
@@ -36,8 +43,6 @@ function loadArtifact(className: string) {
 }
 
 for (const contract in contracts) {
-
-    console.log(contract)
 
     loadArtifact(contract)
 
