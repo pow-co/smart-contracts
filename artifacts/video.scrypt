@@ -10,8 +10,11 @@ contract Video {
   @state HashedMap<int,bytes> segments;
   VarIntReader __scrypt_ts_accessPathReaderForProp__segments;
   @state bool closed;
+  @state bool accepted;
+  @state bool opened;
   @state PubKey owner;
   @state PubKey operator;
+  @state bytes slug;
   @state bytes og_title;
   @state bytes og_description;
   @state bytes og_image;
@@ -24,12 +27,13 @@ contract Video {
   @state bytes og_article_author;
   @state bytes og_article_published_time;
   @state bytes og_article_modified_time;
-  constructor(Sha256 sha256Hash, int contentLength, HashedMap<int,bytes> segments, PubKey owner, PubKey operator, bytes og_title, bytes og_description, bytes og_image, bytes og_url, bytes og_type, bytes og_site_name, bytes og_locale, bytes og_audio, bytes og_video, bytes og_article_author, bytes og_article_published_time, bytes og_article_modified_time) {
+  constructor(Sha256 sha256Hash, int contentLength, HashedMap<int,bytes> segments, PubKey owner, PubKey operator, bytes slug, bytes og_title, bytes og_description, bytes og_image, bytes og_url, bytes og_type, bytes og_site_name, bytes og_locale, bytes og_audio, bytes og_video, bytes og_article_author, bytes og_article_published_time, bytes og_article_modified_time) {
     this.sha256Hash = sha256Hash;
     this.contentLength = contentLength;
     this.segments = segments;
     this.owner = owner;
     this.operator = operator;
+    this.slug = slug;
     this.og_title = og_title;
     this.og_description = og_description;
     this.og_image = og_image;
@@ -43,11 +47,21 @@ contract Video {
     this.og_article_published_time = og_article_published_time;
     this.og_article_modified_time = og_article_modified_time;
     this.closed = false;
+    this.accepted = false;
+    this.opened = false;
+  }
+  public function accept(Sig signature, SigHashPreimage __scrypt_ts_txPreimage, bytes __scrypt_ts_accessPathForProp__segments) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.__scrypt_ts_accessPathReaderForProp__segments = new VarIntReader(__scrypt_ts_accessPathForProp__segments);
+    require(!this.accepted);
+    require(this.segments.size() == 0);
+    require(checkSig(signature, this.operator));
   }
   public function addSegment(Segment segment, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress, bytes __scrypt_ts_accessPathForProp__segments) {
     require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
     this.__scrypt_ts_accessPathReaderForProp__segments = new VarIntReader(__scrypt_ts_accessPathForProp__segments);
     require(!this.closed);
+    require(this.accepted);
     require(this.segments.set({(this.segments.size()), this.__scrypt_ts_accessPathReaderForProp__segments.readInt()}, segment._bytes));
     int amount = SigHash.value(__scrypt_ts_txPreimage);
     bytes outputs = this.buildStateOutput(amount);
@@ -57,11 +71,141 @@ contract Video {
     require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
     require(checkSig(signature, this.owner));
   }
-  public function close(Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+  public function complete(Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
     require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
     this.closed = true;
     int amount = SigHash.value(__scrypt_ts_txPreimage);
     bytes outputs = this.buildStateOutput(amount);
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+    require(checkSig(signature, this.owner));
+  }
+  public function set_og_title(bytes value, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.og_title = value;
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+    require(checkSig(signature, this.owner));
+  }
+  public function set_og_description(bytes value, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.og_description = value;
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+    require(checkSig(signature, this.owner));
+  }
+  public function set_og_image(bytes value, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.og_image = value;
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+    require(checkSig(signature, this.owner));
+  }
+  public function set_og_url(bytes value, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.og_url = value;
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+    require(checkSig(signature, this.owner));
+  }
+  public function set_og_type(bytes value, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.og_type = value;
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+    require(checkSig(signature, this.owner));
+  }
+  public function set_og_site_name(bytes value, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.og_site_name = value;
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+    require(checkSig(signature, this.owner));
+  }
+  public function set_og_locale(bytes value, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.og_locale = value;
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+    require(checkSig(signature, this.owner));
+  }
+  public function set_og_audio(bytes value, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.og_audio = value;
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+    require(checkSig(signature, this.owner));
+  }
+  public function set_og_video(bytes value, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.og_video = value;
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+    require(checkSig(signature, this.owner));
+  }
+  public function set_og_article_author(bytes value, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.og_article_author = value;
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+    require(checkSig(signature, this.owner));
+  }
+  public function set_og_article_published_time(bytes value, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.og_article_published_time = value;
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+    require(checkSig(signature, this.owner));
+  }
+  public function set_og_article_modified_time(bytes value, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.og_article_modified_time = value;
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
+    require(checkSig(signature, this.owner));
+  }
+  public function set_slug(bytes value, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.slug = value;
+    bytes outputs = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
     if(__scrypt_ts_changeAmount > 0) {
         outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
       }

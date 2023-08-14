@@ -10,88 +10,97 @@ import {
     Sha256,
     bsv,
     HashedMap,
-    toByteString
+    toByteString,
 } from 'scrypt-ts'
 
 interface Segment {
-  _bytes: ByteString;
-  duration: ByteString;
+    _bytes: ByteString
+    duration: ByteString
 }
 
 export default class Video extends SmartContract {
+    @prop(false)
+    sha256Hash: Sha256
 
     @prop(false)
-    sha256Hash: Sha256;
-
-    @prop(false)
-    contentLength: bigint;
+    contentLength: bigint
 
     @prop(true)
-    segments: HashedMap<bigint, ByteString>;
+    segments: HashedMap<bigint, ByteString>
 
     @prop(true)
-    closed: boolean;
+    closed: boolean
 
     @prop(true)
-    owner: PubKey;
+    accepted: boolean
 
     @prop(true)
-    operator: PubKey;
+    opened: boolean
 
     @prop(true)
-    og_title: ByteString;
+    owner: PubKey
 
     @prop(true)
-    og_description: ByteString;
+    operator: PubKey
 
     @prop(true)
-    og_image: ByteString;
+    slug: ByteString
 
     @prop(true)
-    og_url: ByteString;
+    og_title: ByteString
 
     @prop(true)
-    og_type: ByteString;
+    og_description: ByteString
 
     @prop(true)
-    og_site_name: ByteString;
+    og_image: ByteString
 
     @prop(true)
-    og_locale: ByteString;
+    og_url: ByteString
 
     @prop(true)
-    og_audio: ByteString;
+    og_type: ByteString
 
     @prop(true)
-    og_video: ByteString;
+    og_site_name: ByteString
 
     @prop(true)
-    og_article_author: ByteString;
+    og_locale: ByteString
 
     @prop(true)
-    og_article_published_time: ByteString;
+    og_audio: ByteString
 
     @prop(true)
-    og_article_modified_time: ByteString;
+    og_video: ByteString
+
+    @prop(true)
+    og_article_author: ByteString
+
+    @prop(true)
+    og_article_published_time: ByteString
+
+    @prop(true)
+    og_article_modified_time: ByteString
 
     constructor(
-      sha256Hash: Sha256,
-      contentLength: bigint,
-      segments: HashedMap<bigint, ByteString>,
-      owner: PubKey,
-      operator: PubKey,
-      og_title: ByteString,
-      og_description: ByteString,
-      og_image: ByteString,
-      og_url: ByteString,
-      og_type: ByteString,
-      og_site_name: ByteString,
-      og_locale: ByteString,
-      og_audio: ByteString,
-      og_video: ByteString,
-      og_article_author: ByteString,
-      og_article_published_time: ByteString,
-      og_article_modified_time: ByteString
+        sha256Hash: Sha256,
+        contentLength: bigint,
+        segments: HashedMap<bigint, ByteString>,
+        owner: PubKey,
+        operator: PubKey,
+        slug: ByteString,
+        og_title: ByteString,
+        og_description: ByteString,
+        og_image: ByteString,
+        og_url: ByteString,
+        og_type: ByteString,
+        og_site_name: ByteString,
+        og_locale: ByteString,
+        og_audio: ByteString,
+        og_video: ByteString,
+        og_article_author: ByteString,
+        og_article_published_time: ByteString,
+        og_article_modified_time: ByteString
     ) {
         super(...arguments)
         this.sha256Hash = sha256Hash
@@ -99,6 +108,7 @@ export default class Video extends SmartContract {
         this.segments = segments
         this.owner = owner
         this.operator = operator
+        this.slug = slug
         this.og_title = og_title
         this.og_description = og_description
         this.og_image = og_image
@@ -113,111 +123,334 @@ export default class Video extends SmartContract {
         this.og_article_modified_time = og_article_modified_time
 
         this.closed = false
-        
+        this.accepted = false
+        this.opened = false
     }
 
     static buildVideo(params: {
-      operator: bsv.PublicKey,
-      owner: bsv.PublicKey,
-      contentLength: bigint,
-      sha256Hash: ByteString,
-      og_title?: ByteString,
-      og_description?: ByteString,
-      og_image?: ByteString,
-      og_url?: ByteString,
-      og_type?: ByteString,
-      og_site_name?: ByteString,
-      og_locale?: ByteString,
-      og_audio?: ByteString,
-      og_video?: ByteString,
-      og_article_author?: ByteString,
-      og_article_published_time?: ByteString,
-      og_article_modified_time?: ByteString
+        operator: bsv.PublicKey
+        owner: bsv.PublicKey
+        contentLength: bigint
+        sha256Hash: ByteString
+        slug?: ByteString
+        og_title?: ByteString
+        og_description?: ByteString
+        og_image?: ByteString
+        og_url?: ByteString
+        og_type?: ByteString
+        og_site_name?: ByteString
+        og_locale?: ByteString
+        og_audio?: ByteString
+        og_video?: ByteString
+        og_article_author?: ByteString
+        og_article_published_time?: ByteString
+        og_article_modified_time?: ByteString
     }): Video {
+        const segments = new HashedMap<bigint, ByteString>()
 
-      const segments = new HashedMap<bigint, ByteString>()
+        const ownerPubkey = PubKey(params.owner.toString())
 
-      const ownerPubkey = PubKey(params.owner.toString())
+        const operatorPubkey = PubKey(params.operator.toString())
 
-      const operatorPubkey = PubKey(params.operator.toString())
+        const slug = toByteString(params.slug || ' ', true)
 
-      const og_title = toByteString(params.og_title || ' ', true)
-      const og_description = toByteString(params.og_description || ' ', true)
-      const og_image = toByteString(params.og_image || ' ', true)
-      const og_url = toByteString(params.og_url || ' ', true)
-      const og_type = toByteString(params.og_type || ' ', true)
-      const og_site_name = toByteString(params.og_site_name || ' ', true)
-      const og_locale = toByteString(params.og_locale || ' ', true)
-      const og_audio = toByteString(params.og_audio || ' ', true)
-      const og_video = toByteString(params.og_video || ' ', true)
-      const og_article_author = toByteString(params.og_article_author || ' ', true)
-      const og_article_published_time = toByteString(params.og_article_published_time || ' ', true)
-      const og_article_modified_time = toByteString(params.og_article_modified_time || ' ', true)
-      
-      return new Video(
-        hash256(toByteString(params.sha256Hash, false)),
-        params.contentLength,
-        segments,
-        ownerPubkey,
-        operatorPubkey,
-        og_title,
-        og_description,
-        og_image,
-        og_url,
-        og_type,
-        og_site_name,
-        og_locale,
-        og_audio,
-        og_video,
-        og_article_author,
-        og_article_published_time,
-        og_article_modified_time      
-      )
+        const og_title = toByteString(params.og_title || ' ', true)
+        const og_description = toByteString(params.og_description || ' ', true)
+        const og_image = toByteString(params.og_image || ' ', true)
+        const og_url = toByteString(params.og_url || ' ', true)
+        const og_type = toByteString(params.og_type || ' ', true)
+        const og_site_name = toByteString(params.og_site_name || ' ', true)
+        const og_locale = toByteString(params.og_locale || ' ', true)
+        const og_audio = toByteString(params.og_audio || ' ', true)
+        const og_video = toByteString(params.og_video || ' ', true)
+        const og_article_author = toByteString(
+            params.og_article_author || ' ',
+            true
+        )
+        const og_article_published_time = toByteString(
+            params.og_article_published_time || ' ',
+            true
+        )
+        const og_article_modified_time = toByteString(
+            params.og_article_modified_time || ' ',
+            true
+        )
 
-    } 
-
-    @method()
-    public addSegment(segment: Segment, signature: Sig) {
-      assert(!this.closed, 'This video stream is closed')
-
-      this.segments.set(BigInt(this.segments.size), segment._bytes)
-
-      const amount: bigint = this.ctx.utxo.value
-      let outputs: ByteString = this.buildStateOutput(amount)
-      if (this.changeAmount > 0n) {
-        outputs += this.buildChangeOutput()
-      }
-      assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
-
-      assert(this.checkSig(signature, this.owner), `checkSig failed, pubkey: ${this.owner}`)
+        return new Video(
+            hash256(toByteString(params.sha256Hash, false)),
+            params.contentLength,
+            segments,
+            ownerPubkey,
+            operatorPubkey,
+            slug,
+            og_title,
+            og_description,
+            og_image,
+            og_url,
+            og_type,
+            og_site_name,
+            og_locale,
+            og_audio,
+            og_video,
+            og_article_author,
+            og_article_published_time,
+            og_article_modified_time
+        )
     }
 
     @method()
-    public close(signature: Sig) {
+    public accept(signature: Sig) {
+        assert(!this.accepted, 'This video upload contract is already accepted')
+        assert(
+            this.segments.size == 0,
+            'Video segments must be empty when accepted'
+        )
+        assert(
+            this.checkSig(signature, this.operator),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
+    }
 
-      this.closed = true
-      const amount: bigint = this.ctx.utxo.value
-      let outputs: ByteString = this.buildStateOutput(amount)
-      if (this.changeAmount > 0n) {
-        outputs += this.buildChangeOutput()
-      }
-      assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
+    @method()
+    public addSegment(segment: Segment, signature: Sig) {
+        assert(!this.closed, 'This video stream is closed')
+        assert(
+            this.accepted,
+            'This video upload contract must be accepted first'
+        )
 
-      assert(this.checkSig(signature, this.owner), `checkSig failed, pubkey: ${this.owner}`)
+        this.segments.set(BigInt(this.segments.size), segment._bytes)
+
+        const amount: bigint = this.ctx.utxo.value
+        let outputs: ByteString = this.buildStateOutput(amount)
+        if (this.changeAmount > 0n) {
+            outputs += this.buildChangeOutput()
+        }
+        assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
+
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
+    }
+
+    @method()
+    public complete(signature: Sig) {
+        this.closed = true
+        const amount: bigint = this.ctx.utxo.value
+        let outputs: ByteString = this.buildStateOutput(amount)
+        if (this.changeAmount > 0n) {
+            outputs += this.buildChangeOutput()
+        }
+        assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
+
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
+    }
+
+    @method()
+    public set_og_title(value: ByteString, signature: Sig) {
+        this.og_title = value
+
+        let outputs: ByteString = this.buildStateOutput(this.ctx.utxo.value)
+
+        if (this.changeAmount > 0n) {
+            outputs += this.buildChangeOutput()
+        }
+
+        assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
+
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
+    }
+
+    @method()
+    public set_og_description(value: ByteString, signature: Sig) {
+        this.og_description = value
+
+        let outputs: ByteString = this.buildStateOutput(this.ctx.utxo.value)
+        if (this.changeAmount > 0n) {
+            outputs += this.buildChangeOutput()
+        }
+        assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
+    }
+
+    @method()
+    public set_og_image(value: ByteString, signature: Sig) {
+        this.og_image = value
+
+        let outputs = this.buildStateOutput(this.ctx.utxo.value)
+        if (this.changeAmount > 0n) {
+            outputs += this.buildChangeOutput()
+        }
+        assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
+    }
+
+    @method()
+    public set_og_url(value: ByteString, signature: Sig) {
+        this.og_url = value
+        let outputs = this.buildStateOutput(this.ctx.utxo.value)
+        if (this.changeAmount > 0n) {
+            outputs += this.buildChangeOutput()
+        }
+        assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
+    }
+
+    @method()
+    public set_og_type(value: ByteString, signature: Sig) {
+        this.og_type = value
+        let outputs = this.buildStateOutput(this.ctx.utxo.value)
+        if (this.changeAmount > 0n) {
+            outputs += this.buildChangeOutput()
+        }
+        assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
+    }
+
+    @method()
+    public set_og_site_name(value: ByteString, signature: Sig) {
+        this.og_site_name = value
+        let outputs = this.buildStateOutput(this.ctx.utxo.value)
+        if (this.changeAmount > 0n) {
+            outputs += this.buildChangeOutput()
+        }
+        assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
+    }
+
+    @method()
+    public set_og_locale(value: ByteString, signature: Sig) {
+        this.og_locale = value
+        let outputs = this.buildStateOutput(this.ctx.utxo.value)
+        if (this.changeAmount > 0n) {
+            outputs += this.buildChangeOutput()
+        }
+        assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
+    }
+
+    @method()
+    public set_og_audio(value: ByteString, signature: Sig) {
+        this.og_audio = value
+        let outputs = this.buildStateOutput(this.ctx.utxo.value)
+        if (this.changeAmount > 0n) {
+            outputs += this.buildChangeOutput()
+        }
+        assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
+    }
+
+    @method()
+    public set_og_video(value: ByteString, signature: Sig) {
+        this.og_video = value
+        let outputs = this.buildStateOutput(this.ctx.utxo.value)
+        if (this.changeAmount > 0n) {
+            outputs += this.buildChangeOutput()
+        }
+        assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
+    }
+
+    @method()
+    public set_og_article_author(value: ByteString, signature: Sig) {
+        this.og_article_author = value
+        let outputs = this.buildStateOutput(this.ctx.utxo.value)
+        if (this.changeAmount > 0n) {
+            outputs += this.buildChangeOutput()
+        }
+        assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
+    }
+
+    @method()
+    public set_og_article_published_time(value: ByteString, signature: Sig) {
+        this.og_article_published_time = value
+        let outputs = this.buildStateOutput(this.ctx.utxo.value)
+        if (this.changeAmount > 0n) {
+            outputs += this.buildChangeOutput()
+        }
+        assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
+    }
+
+    @method()
+    public set_og_article_modified_time(value: ByteString, signature: Sig) {
+        this.og_article_modified_time = value
+        let outputs = this.buildStateOutput(this.ctx.utxo.value)
+        if (this.changeAmount > 0n) {
+            outputs += this.buildChangeOutput()
+        }
+        assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
+    }
+
+    @method()
+    public set_slug(value: ByteString, signature: Sig) {
+        this.slug = value
+        let outputs = this.buildStateOutput(this.ctx.utxo.value)
+        if (this.changeAmount > 0n) {
+            outputs += this.buildChangeOutput()
+        }
+        assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
     }
 
     @method()
     public transfer(newOwner: PubKey, signature: Sig) {
-      assert(this.checkSig(signature, this.owner), `checkSig failed, pubkey: ${this.owner}`)
+        assert(
+            this.checkSig(signature, this.owner),
+            `checkSig failed, pubkey: ${this.owner}`
+        )
 
-      this.owner = newOwner;
-      const amount: bigint = this.ctx.utxo.value
-      let outputs: ByteString = this.buildStateOutput(amount)
-      if (this.changeAmount > 0n) {
-        outputs += this.buildChangeOutput()
-      }
-      assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
-
+        this.owner = newOwner
+        const amount: bigint = this.ctx.utxo.value
+        let outputs: ByteString = this.buildStateOutput(amount)
+        if (this.changeAmount > 0n) {
+            outputs += this.buildChangeOutput()
+        }
+        assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
     }
-
 }

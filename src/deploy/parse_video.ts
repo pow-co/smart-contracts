@@ -10,7 +10,7 @@ import {
     HashedMap,
     ByteString,
     PubKey,
-    TxOutputRef
+    TxOutputRef,
 } from 'scrypt-ts'
 
 import { decode } from 'bs58'
@@ -31,7 +31,9 @@ const privateKey3 = bsv.PrivateKey.fromWIF(process.env.PRIVATE_KEY_3 || '')
 const privateKey4 = bsv.PrivateKey.fromWIF(process.env.PRIVATE_KEY_4 || '')
 
 class Wallet extends TestWallet {
-  get network() { return bsv.Networks.livenet }
+    get network() {
+        return bsv.Networks.livenet
+    }
 }
 
 const provider = new DefaultProvider()
@@ -43,23 +45,18 @@ const publicKey4 = privateKey4.publicKey
 
 // Prepare signer.
 // See https://scrypt.io/docs/how-to-deploy-and-call-a-contract/#prepare-a-signer-and-provider
-const signer = new Wallet(
-    privateKey,
-    provider
-)
+const signer = new Wallet(privateKey, provider)
 
 async function buildNewContract(): Promise<Video> {
-
-    // TODO: Adjust the amount of satoshis locked in the smart contract:
-    const amount = 1
-
     const owner = PubKey(publicKey.toString())
 
     const operator = PubKey(publicKey.toString())
 
     const segments = new HashedMap<bigint, ByteString>()
 
-    const og_title = toByteString(' ', true)
+    const slug = toByteString('that-awesome-dance-party-in-ibiza', true)
+
+    const og_title = toByteString('Dancing In Ibiza Summer 2027', true)
 
     const og_description = toByteString(' ', true)
 
@@ -80,7 +77,7 @@ async function buildNewContract(): Promise<Video> {
     const og_article_author = toByteString(' ', true)
 
     const og_article_published_time = toByteString(' ', true)
-    
+
     const og_article_modified_time = toByteString(' ', true)
 
     const sha256Hash = toByteString(' ', true)
@@ -93,39 +90,37 @@ async function buildNewContract(): Promise<Video> {
         segments,
         owner,
         operator,
+        slug,
         og_title,
         og_description,
         og_image,
-        og_url, 
-        og_type, 
-        og_site_name, 
-        og_locale, 
-        og_audio, 
-        og_video, 
-        og_article_author, 
-        og_article_published_time, 
-        og_article_modified_time 
+        og_url,
+        og_type,
+        og_site_name,
+        og_locale,
+        og_audio,
+        og_video,
+        og_article_author,
+        og_article_published_time,
+        og_article_modified_time
     )
 
-
     return instance
-
 }
 
 async function main() {
-
     await Video.compile()
 
-    const txid = '3ee66e97b50de5190105c71af741cc44ccdcd86389759baae5f830cd5b4e1ed5'
+    const txid =
+        '3ee66e97b50de5190105c71af741cc44ccdcd86389759baae5f830cd5b4e1ed5'
 
     const tx: bsv.Transaction = await fetchTransaction({ txid })
 
     const video = Video.fromTx(tx, 0, {
-        segments: new HashedMap<bigint, ByteString>()
+        segments: new HashedMap<bigint, ByteString>(),
     })
 
     console.log('video.funded', video)
-
 }
 
 main()

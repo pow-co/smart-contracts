@@ -4,8 +4,22 @@
   "scryptfile": "video.scrypt",
   "sourceMapFile": "video.scrypt.map",
   "ctxMethods": [
+    "accept",
     "addSegment",
-    "close",
+    "complete",
+    "set_og_title",
+    "set_og_description",
+    "set_og_image",
+    "set_og_url",
+    "set_og_type",
+    "set_og_site_name",
+    "set_og_locale",
+    "set_og_audio",
+    "set_og_video",
+    "set_og_article_author",
+    "set_og_article_published_time",
+    "set_og_article_modified_time",
+    "set_slug",
     "transfer"
   ]
 }
