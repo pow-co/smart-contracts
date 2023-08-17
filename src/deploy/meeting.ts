@@ -68,6 +68,9 @@ async function deployNewContract(): Promise<Meeting> {
 
     const instance = new Meeting(
         toByteString('Weekly Scrypt Meetup #19', true),
+        toByteString('This is the description of the weekly Scrypt meetup #19.', true),
+        1620000000n,
+        1620003600n,        
         admins,
         invitees,
         attendees,

@@ -1,0 +1,40 @@
+{
+    "version": 9,
+    "compilerVersion": "1.19.0+commit.72eaeba",
+    "contract": "MultiSigPayment3of3",
+    "md5": "a306dd087f8d3b118ebcb50d9f9694f9",
+    "structs": [],
+    "library": [],
+    "alias": [],
+    "abi": [
+        {
+            "type": "function",
+            "name": "unlock",
+            "index": 0,
+            "params": [
+                {
+                    "name": "signatures",
+                    "type": "Sig[3]"
+                },
+                {
+                    "name": "publicKeys",
+                    "type": "PubKey[3]"
+                }
+            ]
+        },
+        {
+            "type": "constructor",
+            "params": [
+                {
+                    "name": "pubKeyHashes",
+                    "type": "Ripemd160[3]"
+                }
+            ]
+        }
+    ],
+    "stateProps": [],
+    "buildType": "debug",
+    "file": "file:///Users/zyler/Desktop/smart-contracts/artifacts/MultiSigPayment3of3.scrypt",
+    "hex": "<pubKeyHashes[0]><pubKeyHashes[1]><pubKeyHashes[2]>6155007600a26976539f695195946b6c766b796c75a953795379537953007600a26976539f699451958c6b6c766b796c756b7575756c87696155517600a26976539f695195946b6c766b796c75a953795379537953517600a26976539f699451958c6b6c766b796c756b7575756c87696155527600a26976539f695195946b6c766b796c75a953795379537953527600a26976539f699451958c6b6c766b796c756b7575756c876900597959795979535a795a795a7953ae777777777777777777",
+    "sourceMapFile": ""
+}

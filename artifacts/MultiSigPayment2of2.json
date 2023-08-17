@@ -1,0 +1,40 @@
+{
+    "version": 9,
+    "compilerVersion": "1.19.0+commit.72eaeba",
+    "contract": "MultiSigPayment2of2",
+    "md5": "72d34ec86a2047223d903f23a0b193ef",
+    "structs": [],
+    "library": [],
+    "alias": [],
+    "abi": [
+        {
+            "type": "function",
+            "name": "unlock",
+            "index": 0,
+            "params": [
+                {
+                    "name": "signatures",
+                    "type": "Sig[2]"
+                },
+                {
+                    "name": "publicKeys",
+                    "type": "PubKey[2]"
+                }
+            ]
+        },
+        {
+            "type": "constructor",
+            "params": [
+                {
+                    "name": "pubKeyHashes",
+                    "type": "Ripemd160[2]"
+                }
+            ]
+        }
+    ],
+    "stateProps": [],
+    "buildType": "debug",
+    "file": "file:///Users/zyler/Desktop/smart-contracts/artifacts/MultiSigPayment2of2.scrypt",
+    "hex": "<pubKeyHashes[0]><pubKeyHashes[1]>6153007600a26976529f695195946b6c766b796c75a95279527952007600a26976529f699451958c6b6c766b796c756b75756c87696153517600a26976529f695195946b6c766b796c75a95279527952517600a26976529f699451958c6b6c766b796c756b75756c87690056795679525779577952ae777777777777",
+    "sourceMapFile": ""
+}

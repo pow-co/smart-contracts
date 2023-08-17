@@ -1,0 +1,10 @@
+
+contract MultiSigPayment2of2 {
+  const Ripemd160[2] pubKeyHashes;
+  public function unlock(Sig[2] signatures, PubKey[2] publicKeys) {
+    loop (2) : i {
+        require(hash160(publicKeys[i]) == this.pubKeyHashes[i]);
+      }
+    require(checkMultiSig(signatures, publicKeys));
+  }
+}

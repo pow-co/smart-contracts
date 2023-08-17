@@ -1,0 +1,27 @@
+
+contract Bookmark {
+  bytes content_location;
+  Ripemd160 owner;
+  @state bytes directory;
+  @state bytes tags;
+  public function unlock(Sig signature, PubKey pubkey) {
+    require(hash160(pubkey) == this.owner);
+    require(checkSig(signature, pubkey));
+  }
+  public function setTags(bytes tags, Sig signature, PubKey pubkey, SigHashPreimage __scrypt_ts_txPreimage) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.tags = tags;
+    bytes output = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(output));
+  }
+  public function setDirectory(bytes directory, Sig signature, PubKey pubkey, SigHashPreimage __scrypt_ts_txPreimage) {
+    require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
+    this.directory = directory;
+    bytes output = this.buildStateOutput(SigHash.value(__scrypt_ts_txPreimage));
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(output));
+  }
+    function buildStateOutput(int amount): bytes {
+      bytes script = this.getStateScript();
+      return Utils.buildOutput(script, amount);
+    }
+}

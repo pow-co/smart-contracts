@@ -1,6 +1,9 @@
 
 contract Meeting {
   @state bytes title;
+  @state bytes description;
+  @state int start;
+  @state int end;
   @state HashedSet<PubKey> admins;
   VarIntReader __scrypt_ts_accessPathReaderForProp__admins;
   @state HashedSet<PubKey> attendees;
@@ -9,8 +12,11 @@ contract Meeting {
   VarIntReader __scrypt_ts_accessPathReaderForProp__invitees;
   @state bool cancelled;
   @state bool inviteRequired;
-  constructor(bytes title, HashedSet<PubKey> admins, HashedSet<PubKey> invitees, HashedSet<PubKey> attendees, bool inviteRequired) {
+  constructor(bytes title, bytes description, int start, int end, HashedSet<PubKey> admins, HashedSet<PubKey> invitees, HashedSet<PubKey> attendees, bool inviteRequired) {
     this.title = title;
+    this.description = description;
+    this.start = start;
+    this.end = end;
     this.admins = admins;
     this.invitees = invitees;
     this.inviteRequired = inviteRequired;

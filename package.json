@@ -1,6 +1,6 @@
 {
   "name": "@powco/smart-contracts",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Collection of Smart Contracts for Sharing Among Front And Back End Developers",
   "author": "The Proof of Work Company",
   "main": "dist/src/index.js",
@@ -38,6 +38,7 @@
   "dependencies": {
     "axios": "^1.4.0",
     "delay": "^6.0.0",
+    "bs58": "^5.0.0",
     "dotenv": "^16.0.3",
     "require-all": "^3.0.0",
     "scrypt-ts": "latest"

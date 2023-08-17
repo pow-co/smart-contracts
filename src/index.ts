@@ -11,10 +11,16 @@ interface Contracts {
 }
 
 import Video from './contracts/video'
+import { Logger } from './contracts/logger'
+import { Meeting } from './contracts/meeting'
 
 const contracts: Contracts = {
-    Video: Video,
+    Video,
+    Meeting,
+    Logger
 }
+
+export { Video, Meeting, Logger }
 
 function loadArtifact(className: string) {
     const artifactFileName = `${lowercaseFirstLetter(className)}.json`
@@ -41,7 +47,6 @@ for (const contract in contracts) {
     module.exports[contract] = contracts[contract]
 }
 
-export { Video }
 
 export { contracts }
 

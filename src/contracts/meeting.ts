@@ -2,13 +2,9 @@ import {
     assert,
     ByteString,
     method,
-    toByteString,
     prop,
-    sha256,
     hash256,
-    Sha256,
     SmartContract,
-    ScriptContext,
     HashedSet,
     PubKey,
     Sig
@@ -17,6 +13,15 @@ import {
 export class Meeting extends SmartContract {
     @prop(true)
     title: ByteString;
+
+    @prop(true)
+    description: ByteString;
+
+    @prop(true)
+    start: bigint;
+
+    @prop(true)
+    end: bigint;
 
     @prop(true)
     admins: HashedSet<PubKey>
@@ -35,13 +40,19 @@ export class Meeting extends SmartContract {
 
     constructor(
       title: ByteString,
+      description: ByteString,
+      start: bigint,
+      end: bigint,      
       admins: HashedSet<PubKey>,
       invitees: HashedSet<PubKey>,
       attendees: HashedSet<PubKey>,
       inviteRequired: boolean
     ) {
-        super(...arguments)
+        super(...arguments)                
         this.title = title
+        this.description = description
+        this.start = start
+        this.end = end
         this.admins = admins
         this.invitees = invitees
         this.inviteRequired = inviteRequired
