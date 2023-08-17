@@ -106,6 +106,12 @@ async function main() {
 
       meeting = await deployNewContract() 
 
+      console.log(meeting)
+
+      console.log(meeting.lockingScript.toASM())
+
+      return
+
     } else {
 
       const [txid, vout] = origin.split('_')

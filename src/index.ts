@@ -1,8 +1,9 @@
-import { join } from 'path'
 
 import { SmartContract, ByteString } from 'scrypt-ts'
 
-export { HashedMap, bsv } from 'scrypt-ts'
+export { HashedMap, HashedSet, PubKey, bsv } from 'scrypt-ts'
+
+export * as scrypt from 'scrypt-ts'
 
 export { ByteString }
 
@@ -22,31 +23,9 @@ const contracts: Contracts = {
 
 export { Video, Meeting, Logger }
 
-function loadArtifact(className: string) {
-    const artifactFileName = `${lowercaseFirstLetter(className)}.json`
-
-    const artifactPath = join(
-        __dirname,
-        '..',
-        '..',
-        'artifacts',
-        artifactFileName
-    )
-
-    const artifact = require(artifactPath)
-
-    const Contract = contracts[className]
-
-    //@ts-ignore
-    Contract.loadArtifact(artifact)
-}
-
 for (const contract in contracts) {
     loadArtifact(contract)
-
-    module.exports[contract] = contracts[contract]
 }
-
 
 export { contracts }
 
@@ -58,4 +37,16 @@ export { Wallet } from './scrypt_wallet'
 
 function lowercaseFirstLetter(string) {
     return string.charAt(0).toLowerCase() + string.slice(1)
+}
+
+function loadArtifact(className: string) {
+    const artifactFileName = `${lowercaseFirstLetter(className)}.json`
+
+    const artifactPath = `../../artifacts/${artifactFileName}`
+
+    const artifact = require(artifactPath)
+
+    const Contract = contracts[className]
+
+    Contract.loadArtifact(artifact)
 }
