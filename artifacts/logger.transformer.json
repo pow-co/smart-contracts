@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "errors": [],
+  "scryptfile": "logger.scrypt",
+  "sourceMapFile": "logger.scrypt.map",
+  "ctxMethods": [
+    "log",
+    "destroy"
+  ]
+}

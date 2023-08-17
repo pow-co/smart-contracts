@@ -47,9 +47,9 @@ export { contracts }
 
 export default contracts
 
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1)
-}
+export { LogOperator } from './log_operator'
+
+export { Wallet } from './scrypt_wallet'
 
 function lowercaseFirstLetter(string) {
     return string.charAt(0).toLowerCase() + string.slice(1)

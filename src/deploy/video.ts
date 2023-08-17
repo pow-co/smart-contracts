@@ -10,7 +10,9 @@ import {
     HashedMap,
     ByteString,
     PubKey,
-    hash256
+    hash256,
+    findSig,
+    MethodCallOptions
 } from 'scrypt-ts'
 
 import { decode } from 'bs58'
@@ -69,7 +71,7 @@ async function main() {
 
     await Video.compile()
 
-    const video: Video = await buildNewContract()
+    var video: Video = await buildNewContract()
 
     await video.connect(signer)
 
@@ -78,6 +80,61 @@ async function main() {
     await video.connect(signer)
 
     console.log('video.funded', {txid: fundingTx.hash })
+
+    const nextInstance = video.next()
+
+    nextInstance.accepted = true
+
+    const { tx: acceptTx } = await video.methods.accept((sigResponses: any) => {
+        return findSig(sigResponses, publicKey)
+      }, {
+        pubKeyOrAddrToSign: publicKey.toAddress(),
+        next:{
+          instance: nextInstance,
+          balance: video.balance
+        }
+      } as MethodCallOptions<Video>)
+
+      console.log('video.accepted', {txid: acceptTx.hash })
+
+      video = Video.fromTx(acceptTx, 0, {
+        segments: nextInstance.segments
+      })
+
+      await video.connect(signer)
+
+      for (let i=0; i<1000; i++) {
+
+        const nextAddSegment = video.next()
+
+        const segmentBytes = toByteString('hls video segment part', true)
+  
+        nextAddSegment.segments.set(BigInt(video.segments.size), segmentBytes)
+  
+        const { tx: addSegmentTx } = await video.methods.addSegment({
+          _bytes: segmentBytes,
+          duration: toByteString('8.333333', true)
+        }, (sigResponses: any) => {
+          return findSig(sigResponses, publicKey)
+        }, {
+          pubKeyOrAddrToSign: publicKey.toAddress(),
+          next:{
+            instance: nextAddSegment,
+            balance: video.balance
+          }
+        } as MethodCallOptions<Video>)
+  
+        console.log('video.addSegment.result', {txid: addSegmentTx.hash, index: i })
+
+        video = Video.fromTx(addSegmentTx, 0, {
+            segments: nextAddSegment.segments
+        })
+
+        await video.connect(signer)
+
+      }
+
+
 
 }
 

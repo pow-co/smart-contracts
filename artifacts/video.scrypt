@@ -50,12 +50,19 @@ contract Video {
     this.accepted = false;
     this.opened = false;
   }
-  public function accept(Sig signature, SigHashPreimage __scrypt_ts_txPreimage, bytes __scrypt_ts_accessPathForProp__segments) {
+  public function accept(Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress, bytes __scrypt_ts_accessPathForProp__segments) {
     require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
     this.__scrypt_ts_accessPathReaderForProp__segments = new VarIntReader(__scrypt_ts_accessPathForProp__segments);
     require(!this.accepted);
     require(this.segments.size() == 0);
     require(checkSig(signature, this.operator));
+    this.accepted = true;
+    int amount = SigHash.value(__scrypt_ts_txPreimage);
+    bytes outputs = this.buildStateOutput(amount);
+    if(__scrypt_ts_changeAmount > 0) {
+        outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
+      }
+    require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
   }
   public function addSegment(Segment segment, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress, bytes __scrypt_ts_accessPathForProp__segments) {
     require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));
@@ -66,6 +73,7 @@ contract Video {
     int amount = SigHash.value(__scrypt_ts_txPreimage);
     bytes outputs = this.buildStateOutput(amount);
     if(__scrypt_ts_changeAmount > 0) {
+        
         outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
       }
     require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
