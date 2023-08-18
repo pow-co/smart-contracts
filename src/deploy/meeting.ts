@@ -59,19 +59,19 @@ async function deployNewContract(): Promise<Meeting> {
 
     const owner = PubKeyHash(Ripemd160(Buffer.from(decode(privateKey.toAddress().toString())).toString('hex')))
 
-    var admins = new HashedSet<PubKey>()
     const invitees = new HashedSet<PubKey>()
     const attendees = new HashedSet<PubKey>()
     const inviteRequired = false
-
-    admins = admins.add(PubKey(publicKey.toString()))
 
     const instance = new Meeting(
         toByteString('Weekly Scrypt Meetup #19', true),
         toByteString('This is the description of the weekly Scrypt meetup #19.', true),
         1620000000n,
-        1620003600n,        
-        admins,
+        1620003600n,
+        toByteString('Token Meet Online', true),
+        toByteString('https://pow.co/meet/{origin}', true),
+        toByteString('CONFIRMED', true),
+        PubKey(privateKey.publicKey.toString()),
         invitees,
         attendees,
         inviteRequired
@@ -79,7 +79,6 @@ async function deployNewContract(): Promise<Meeting> {
 
     const network = await provider.getNetwork()
 
-    console.log({ network })
 
     // Connect to a signer.
     await instance.connect(signer)
@@ -98,17 +97,21 @@ async function main() {
 
     const origin = process.env.meeting_origin || `2ee639a86283a7032ef379b8b7841c3953bb5f5cbfb002d393b4cda18d540e81_0`
 
-    var meeting: Meeting;
+    let meeting: Meeting;
 
     const pubKey = PubKey(publicKey.toString())
+
+    meeting = await deployNewContract() 
+
+    console.log(meeting)
+
+    /*
 
     if (true) {
 
       meeting = await deployNewContract() 
 
       console.log(meeting)
-
-      console.log(meeting.lockingScript.toASM())
 
       return
 
@@ -244,7 +247,8 @@ async function main() {
       console.log(attendee)
 
     })
-
+    
+    */
 }
 
 main()

@@ -18,13 +18,22 @@ export class Meeting extends SmartContract {
     description: ByteString;
 
     @prop(true)
+    location: ByteString;
+
+    @prop(true)
+    url: ByteString;
+
+    @prop(true)
+    status: ByteString;
+
+    @prop(true)
     start: bigint;
 
     @prop(true)
     end: bigint;
 
     @prop(true)
-    admins: HashedSet<PubKey>
+    organizer: PubKey;
 
     @prop(true)
     attendees: HashedSet<PubKey>
@@ -42,8 +51,12 @@ export class Meeting extends SmartContract {
       title: ByteString,
       description: ByteString,
       start: bigint,
-      end: bigint,      
-      admins: HashedSet<PubKey>,
+      end: bigint,  
+      location: ByteString,
+      url: ByteString,
+      //categories: HashedSet<ByteString>,
+      status: ByteString,
+      organizer: PubKey,
       invitees: HashedSet<PubKey>,
       attendees: HashedSet<PubKey>,
       inviteRequired: boolean
@@ -53,7 +66,11 @@ export class Meeting extends SmartContract {
         this.description = description
         this.start = start
         this.end = end
-        this.admins = admins
+        this.location = location
+        this.url = url
+        this.status = status
+
+        this.organizer = organizer
         this.invitees = invitees
         this.inviteRequired = inviteRequired
         this.attendees = attendees
@@ -61,11 +78,9 @@ export class Meeting extends SmartContract {
     }
 
     @method()
-    public uncancel(pubkey: PubKey, sig: Sig) {
+    public uncancel(sig: Sig) {
 
-        assert(this.checkSig(sig, pubkey),`checkSig failed, pubkey: ${pubkey}`)
-
-        assert(this.admins.has(pubkey))
+        assert(this.checkSig(sig, this.organizer),`checkSig failed, pubkey: ${this.organizer}`)
 
         this.cancelled = false
 
@@ -76,11 +91,9 @@ export class Meeting extends SmartContract {
     }
 
     @method()
-    public invite(invitee: PubKey, pubkey: PubKey, sig: Sig) {
+    public invite(invitee: PubKey, sig: Sig) {
 
-        assert(this.checkSig(sig, pubkey),`checkSig failed, pubkey: ${pubkey}`)
-
-        assert(this.admins.has(pubkey))
+        assert(this.checkSig(sig, this.organizer),`checkSig failed, pubkey: ${this.organizer}`)
 
         if (!this.invitees.has(invitee) && !this.attendees.has(invitee)) {
           this.invitees.add(invitee)
@@ -121,7 +134,7 @@ export class Meeting extends SmartContract {
       assert(this.checkSig(sig, pubkey),`checkSig failed, pubkey: ${pubkey}`)
 
       if (this.inviteRequired) {
-        assert(this.invitees.has(pubkey) || this.admins.has(pubkey))
+        assert(this.invitees.has(pubkey) || pubkey == this.organizer)
       }
 
       this.attendees.add(pubkey)
@@ -140,16 +153,14 @@ export class Meeting extends SmartContract {
       return this.invitees.has(pubkey)
     }
 
-    isAdmin(pubkey: PubKey): boolean {
-      return this.admins.has(pubkey)
+    isOrganizer(pubkey: PubKey): boolean {
+      return this.organizer == pubkey
     }
 
     @method()
-    public cancel(pubkey: PubKey, sig: Sig) {
+    public cancel(sig: Sig) {
 
-        assert(this.checkSig(sig, pubkey),`checkSig failed, pubkey: ${pubkey}`)
-
-        assert(this.admins.has(pubkey))
+        assert(this.checkSig(sig, this.organizer),`checkSig failed, pubkey: ${this.organizer}`)
 
         this.cancelled = true
 
