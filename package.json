@@ -1,6 +1,6 @@
 {
   "name": "@powco/smart-contracts",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Collection of Smart Contracts for Sharing Among Front And Back End Developers",
   "author": "The Proof of Work Company",
   "main": "dist/src/index.js",

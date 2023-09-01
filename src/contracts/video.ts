@@ -217,7 +217,6 @@ export default class Video extends SmartContract {
             outputs += this.buildChangeOutput()
         }
         assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
-
     }
 
     @method()
@@ -230,7 +229,6 @@ export default class Video extends SmartContract {
 
         this.segments.set(BigInt(this.segments.size), segment._bytes)
 
-
         const amount: bigint = this.ctx.utxo.value
         let outputs: ByteString = this.buildStateOutput(amount)
         if (this.changeAmount > 0n) {
@@ -240,8 +238,8 @@ export default class Video extends SmartContract {
         assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
 
         assert(
-            this.checkSig(signature, this.owner),
-            `checkSig failed, pubkey: ${this.owner}`
+            this.checkSig(signature, this.operator),
+            `checkSig failed, operator: ${this.operator}`
         )
     }
 
