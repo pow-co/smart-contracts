@@ -88,7 +88,7 @@ contract Video {
         outputs += (__scrypt_ts_changeAmount > 0 ? Utils.buildOutput(Utils.buildPublicKeyHashScript(__scrypt_ts_changeAddress), __scrypt_ts_changeAmount) : b'');
       }
     require(SigHash.hashOutputs(__scrypt_ts_txPreimage) == hash256(outputs));
-    require(checkSig(signature, this.owner));
+    require(checkSig(signature, this.operator));
   }
   public function set_og_title(bytes value, Sig signature, SigHashPreimage __scrypt_ts_txPreimage, int __scrypt_ts_changeAmount, Ripemd160 __scrypt_ts_changeAddress) {
     require(Tx.checkPreimageSigHashType(__scrypt_ts_txPreimage, SigHashType(b'41')));

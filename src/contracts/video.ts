@@ -254,8 +254,8 @@ export default class Video extends SmartContract {
         assert(this.ctx.hashOutputs == hash256(outputs), 'hashOutputs mismatch')
 
         assert(
-            this.checkSig(signature, this.owner),
-            `checkSig failed, pubkey: ${this.owner}`
+            this.checkSig(signature, this.operator),
+            `checkSig failed, operator: ${this.operator}`
         )
     }
 
